@@ -1,0 +1,57 @@
+package edu.cibertec.cola.receptor;
+
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.ObjectMessage;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+
+import org.apache.activemq.ActiveMQConnection;
+import org.apache.activemq.ActiveMQConnectionFactory;
+
+import edu.cibertec.entidades.Clientes;
+
+public class ReceptorObjeto {
+	
+	private static String url = ActiveMQConnection.DEFAULT_BROKER_URL;
+	private static String cola = "Cibertec";
+	public ReceptorObjeto() {
+		
+	}
+	
+	public static void receiveMessage() {
+		
+		try {
+			ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(url);
+			factory.setTrustAllPackages(true);
+			Connection connection = factory.createConnection();
+			connection.start();
+			Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			Destination destination = session.createQueue(cola);
+			MessageConsumer consumer = session.createConsumer(destination);
+			Message message = consumer.receive();
+			if (message instanceof ObjectMessage) {
+				ObjectMessage obj = (ObjectMessage)message;
+				Clientes cli = (Clientes)obj.getObject();
+				System.out.println(String.format("Cliente recibido : %s", cli));
+			}
+			consumer.close();
+			session.close();
+			connection.close();
+		}
+		catch(JMSException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public static void main(String[] args) {
+		receiveMessage();
+	}
+
+}

@@ -1,0 +1,52 @@
+package edu.cibertec.cola.receptor;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+
+import org.apache.activemq.ActiveMQConnection;
+import org.apache.activemq.ActiveMQConnectionFactory;
+
+
+public class Receptor {
+
+	private static String url = ActiveMQConnection.DEFAULT_BROKER_URL;
+	private static String cola = "Cibertec";
+	public Receptor() {
+		
+	}
+	
+	public static void receiveMessage() {
+		
+		try {
+			ConnectionFactory factory = new ActiveMQConnectionFactory(url);
+			Connection connection = factory.createConnection();
+			connection.start();
+			Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			Destination destination = session.createQueue(cola);
+			MessageConsumer consumer = session.createConsumer(destination);
+			Message message = consumer.receive();
+			if (message instanceof TextMessage) {
+				TextMessage text = (TextMessage)message;
+				System.out.println("El mensaje que me llego es : "+text.getText());
+			}
+			consumer.close();
+			session.close();
+			connection.close();
+		}
+		catch(JMSException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public static void main(String[] args) {
+		receiveMessage();
+	}
+
+}

@@ -1,0 +1,7 @@
+package edu.cibertec.entidades;
+
+import java.io.Serializable;
+
+public class Clientes implements Serializable {
+
+}

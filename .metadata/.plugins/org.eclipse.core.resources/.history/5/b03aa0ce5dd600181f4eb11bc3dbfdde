@@ -1,0 +1,5 @@
+package edu.cibertec.cola.receptor;
+
+public class Receptor {
+
+}
